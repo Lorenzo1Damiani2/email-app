@@ -3,11 +3,10 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
 from flask import Flask, jsonify
-from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
+# Configure logging to log to a file
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
 
 df = pd.read_csv('data_with_dates.csv')
 df["date"] = pd.to_datetime(df["date"])
@@ -55,6 +54,7 @@ def send_email():
 
 @app.route('/')
 def index():
+    logging.info("Index route accessed")
     return jsonify({"message": "Email has been sent!"})
 
 @app.route('/send_email')
@@ -64,18 +64,6 @@ def trigger_email():
     return jsonify({"message": "Email sent successfully!"})
 
 if __name__ == "__main__":
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(send_email, 'cron', hour=14, minute=18)  # 15:00 GMT+2
-    scheduler.add_job(send_email, 'cron', hour=14, minute=19)  # 15:00 GMT+2
-    scheduler.add_job(send_email, 'cron', hour=14, minute=20)  # 15:00 GMT+2
-    scheduler.add_job(send_email, 'cron', hour=16, minute=18)  # 15:00 GMT+2
-    scheduler.add_job(send_email, 'cron', hour=16, minute=19)  # 15:00 GMT+2
-    scheduler.add_job(send_email, 'cron', hour=16, minute=20)  # 15:00 GMT+2
-    scheduler.start()
-    logging.info("Scheduler started")
-
-    try:
-        app.run(debug=False, host='0.0.0.0', port=8080)
-    except (KeyboardInterrupt, SystemExit):
-        scheduler.shutdown()
-        logging.info("Scheduler shut down")
+    logging.info("Starting Flask app")
+    send_email()  # Send the email once when the app starts
+    app.run(debug=False, host='0.0.0.0', port=8080)
