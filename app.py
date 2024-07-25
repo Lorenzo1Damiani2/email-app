@@ -51,7 +51,12 @@ def index():
 
 if __name__ == "__main__":
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_email, 'cron', hour=15, minute=28)
+    
+    # Schedule the email to be sent at three different times
+    scheduler.add_job(send_email, 'cron', hour=15, minute=36)
+    scheduler.add_job(send_email, 'cron', hour=14, minute=36)
+    scheduler.add_job(send_email, 'cron', hour=13, minute=36)
+    
     scheduler.start()
 
     try:
