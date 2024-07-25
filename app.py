@@ -4,6 +4,8 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from flask import Flask, jsonify
 import logging
+import requests
+import time
 
 # Configure logging to log to a file
 logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
@@ -65,5 +67,17 @@ def trigger_email():
 
 if __name__ == "__main__":
     logging.info("Starting Flask app")
-    send_email()  # Send the email once when the app starts
     app.run(debug=False, host='0.0.0.0', port=8080)
+    
+    # Wait for a few seconds to ensure the server is fully started
+    time.sleep(5)
+
+    # Trigger the send_email endpoint
+    try:
+        response = requests.get('http://127.0.0.1:8080/send_email')
+        if response.status_code == 200:
+            logging.info("Email triggered successfully at startup")
+        else:
+            logging.error(f"Failed to trigger email at startup: {response.status_code}")
+    except Exception as e:
+        logging.error(f"Exception occurred while triggering email at startup: {e}")
