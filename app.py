@@ -3,13 +3,13 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
 from flask import Flask, jsonify
+from apscheduler.schedulers.background import BackgroundScheduler
 
 df = pd.read_csv('data_with_dates.csv')
 df["date"] = pd.to_datetime(df["date"])
 
 app = Flask(__name__)
 
-@app.route('/')
 def send_email():
     today = datetime.today().date()
     word_of_the_day_row = df[df['date'].dt.date == today]
@@ -43,7 +43,17 @@ def send_email():
     except Exception as e:
         print(f"Failed to send email: {e}")
 
-    return jsonify({"message": "Email sent successfully!"})
+@app.route('/')
+def index():
+    return jsonify({"message": "Scheduler is running. Email will be sent as per schedule."})
 
 if __name__ == "__main__":
-    app.run(debub = True)
+    scheduler = BackgroundScheduler()
+    # Schedule job_function to be called every day at 8:00 AM
+    scheduler.add_job(send_email, 'cron', hour=8, minute=0)
+    scheduler.start()
+
+    try:
+        app.run(debug=True, host='0.0.0.0', port=8080)
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
