@@ -51,7 +51,7 @@ def index():
 
 if __name__ == "__main__":
     scheduler = BackgroundScheduler()
-    scheduler.add_job(send_email, 'cron', hour=8, minute=0)
+    scheduler.add_job(send_email, 'cron', hour=15, minute=28)
     scheduler.start()
 
     try:
