@@ -54,7 +54,9 @@ def send_email():
 def index():
     return jsonify({"message": "Email has been sent!"})
 
-if __name__ == "__main__":
-    send_email()  # Send the email when the application starts
-    app.run(debug=False, host='0.0.0.0', port=8080)
+@app.before_first_request
+def before_first_request_func():
+    send_email()
 
+if __name__ == "__main__":
+    app.run(debug=False, host='0.0.0.0', port=8080)
