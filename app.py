@@ -5,11 +5,13 @@ from datetime import datetime
 from flask import Flask, jsonify
 import logging
 
+# Configure logging to log to a file
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
+
 df = pd.read_csv('data_with_dates.csv')
 df["date"] = pd.to_datetime(df["date"])
 
 app = Flask(__name__)
-logging.basicConfig(level=logging.INFO)
 
 def send_email():
     logging.info("send_email function started")
@@ -52,11 +54,15 @@ def send_email():
 
 @app.route('/')
 def index():
+    logging.info("Index route accessed")
     return jsonify({"message": "Email has been sent!"})
 
-@app.before_first_request
-def before_first_request_func():
+@app.route('/send_email')
+def trigger_email():
+    logging.info("/send_email route accessed")
     send_email()
+    return jsonify({"message": "Email sent successfully!"})
 
 if __name__ == "__main__":
+    logging.info("Starting Flask app")
     app.run(debug=False, host='0.0.0.0', port=8080)
