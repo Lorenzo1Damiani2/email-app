@@ -4,11 +4,13 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
 
 df = pd.read_csv('data_with_dates.csv')
 df["date"] = pd.to_datetime(df["date"])
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def send_email():
     today = datetime.today().date()
@@ -21,8 +23,8 @@ def send_email():
         word_of_the_day = None
         meaning = None
 
-    print(f"Word of the Day (Catalan): {word_of_the_day}")
-    print(f"Meaning (English): {meaning}")
+    logging.info(f"Word of the Day (Catalan): {word_of_the_day}")
+    logging.info(f"Meaning (English): {meaning}")
 
     email_content = f"Word of the Day: {word_of_the_day}\nMeaning: {meaning}"
 
@@ -39,9 +41,9 @@ def send_email():
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("Email sent successfully!")
+        logging.info("Email sent successfully!")
     except Exception as e:
-        print(f"Failed to send email: {e}")
+        logging.error(f"Failed to send email: {e}")
 
 @app.route('/')
 def index():
@@ -49,7 +51,6 @@ def index():
 
 if __name__ == "__main__":
     scheduler = BackgroundScheduler()
-    # Schedule job_function to be called every day at 8:00 AM
     scheduler.add_job(send_email, 'cron', hour=8, minute=0)
     scheduler.start()
 
