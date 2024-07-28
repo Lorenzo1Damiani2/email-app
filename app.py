@@ -38,7 +38,7 @@ def send_email():
     
     sender_email = "lorenzodamiani06@gmail.com"
     receiver_email = "damianilorenzo06@gmail.com"
-    password = "xwsl fvio vzpu xcwn"
+    password = "****"
     
     msg = MIMEText(email_content)
     msg['Subject'] = f"Word of the Day: {word_of_the_day}"
